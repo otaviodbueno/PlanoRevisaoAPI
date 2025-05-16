@@ -32,7 +32,7 @@ public class PlanoRevisao
     public virtual Linha Linha { get; set; }
 
     [ForeignKey("IdPoliticaVenda")]
-    public virtual PoliticaVenda PoliticaVenda { get; set; } = null!;
+    public virtual PoliticaVenda PoliticaVenda { get; set; }
 
-    public virtual ICollection<Planorevisaotipo> Planorevisaotipos { get; set; } = new List<Planorevisaotipo>();
+    public virtual ICollection<PlanoRevisaoTipo> PlanoRevisaoTipo { get; set; }
 }

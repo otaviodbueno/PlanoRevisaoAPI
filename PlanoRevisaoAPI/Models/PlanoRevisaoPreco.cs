@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PlanoRevisaoAPI.Models;
@@ -7,6 +8,7 @@ namespace PlanoRevisaoAPI.Models;
 [Table("PLANOREVISAOPRECO")]
 public partial class PlanoRevisaoPreco
 {
+    [Key]
     public int IdPlanoRevisaoPreco { get; set; }
 
     public int IdPlanoRevisaoTipo { get; set; }

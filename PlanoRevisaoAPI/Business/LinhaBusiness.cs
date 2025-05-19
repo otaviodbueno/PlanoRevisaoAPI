@@ -16,6 +16,18 @@ public class LinhaBusiness : ILinhaBusiness
         return _linhaRepository.GetAll().ToList();
     }
 
+    public List<Linha> Get(string nome)
+    {
+        var linha = _linhaRepository.Get(x => x.NM_LINHA == nome).ToList();
+
+        if (linha is null)
+        {
+            throw new Exception("Linha não encontrada");
+        }
+        
+        return linha;
+    }
+
     public Linha PostLinha(Linha linha)
     {
         try

@@ -24,12 +24,12 @@ public class LinhaController : ControllerBase
         return Ok(linhas);
     }
 
-    //// GET api/<ValuesController>/5
-    //[HttpGet("{id}")]
-    //public string Get(int id)
-    //{
-    //    return "value";
-    //}
+    [HttpGet("GetPorNome")]
+    public ActionResult<List<Linha>> Get(string nome)
+    {
+        var linhas = _linhaBusiness.Get(nome);
+        return Ok(linhas);
+    }
 
     [HttpPost]
     public ActionResult<Linha> Post(Linha linha)
@@ -38,15 +38,4 @@ public class LinhaController : ControllerBase
         return Ok(linha);
     }
 
-    //// PUT api/<ValuesController>/5
-    //[HttpPut("{id}")]
-    //public void Put(int id, [FromBody] string value)
-    //{
-    //}
-
-    //// DELETE api/<ValuesController>/5
-    //[HttpDelete("{id}")]
-    //public void Delete(int id)
-    //{
-    //}
 }

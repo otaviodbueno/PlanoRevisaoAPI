@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using System;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace PlanoRevisaoAPI.Repository;
 
@@ -22,6 +23,11 @@ public class Repository<T> : IRepository<T> where T : class
     public IEnumerable<T> GetAll()
     {
         return _context.Set<T>().AsNoTracking().ToList();
+    }
+
+    public IEnumerable<T> Get(Func<T, bool> predicate)
+    {
+        return _context.Set<T>().AsNoTracking().Where(predicate).ToList();
     }
 
     public T Create(T entity)

@@ -38,4 +38,18 @@ public class LinhaController : ControllerBase
         return Ok(linha);
     }
 
+    [HttpPut("id")]
+    public ActionResult<Linha> PutLinha(int id)
+    {
+        var linha = _linhaBusiness.AtualizarLinha(id);
+        return Created("", linha);
+    }
+
+    [HttpDelete("{id}")]
+    public ActionResult DeletarLinhaPorId(int id)
+    {
+       _linhaBusiness.DeleteLinhaPorId(id);
+        return NoContent();
+    }
+
 }

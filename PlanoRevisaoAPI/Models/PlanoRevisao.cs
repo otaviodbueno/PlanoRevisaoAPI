@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 
 namespace PlanoRevisaoAPI.Models;
@@ -12,27 +13,30 @@ namespace PlanoRevisaoAPI.Models;
 public class PlanoRevisao
 {
     [Key]
-    public int IdPlanoRevisao { get; set; }
+    public int ID_PLANO_REVISAO { get; set; }
 
-    public string DsPlanoRevisao { get; set; } = null!;
+    public string DS_PLANO_REVISAO { get; set; }
 
-    public int IdLinha { get; set; }
+    public int ID_LINHA { get; set; }
 
-    public DateTime DtInclusao { get; set; }
+    public DateTime DT_INCLUSAO { get; set; }
 
-    public DateTime? DtVigenciaInicial { get; set; }
+    public DateTime? DT_VIGENCIA_INICIAL { get; set; }
 
-    public DateTime? DtVigenciaFinal { get; set; }
+    public DateTime? DT_VIGENCIA_FINAL { get; set; }
 
-    public int? NuMesesGarantia { get; set; }
+    public int? NU_MESES_GARANTIA { get; set; }
 
-    public int IdPoliticaVenda { get; set; }
+    public int ID_POLITICA_VENDA { get; set; }
 
     [ForeignKey("IdLinha")]
+    [JsonIgnore]
     public virtual Linha Linha { get; set; }
 
     [ForeignKey("IdPoliticaVenda")]
+    [JsonIgnore]
     public virtual PoliticaVenda PoliticaVenda { get; set; }
 
+    [JsonIgnore]
     public virtual ICollection<PlanoRevisaoTipo> PlanoRevisaoTipo { get; set; }
 }

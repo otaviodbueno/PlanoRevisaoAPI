@@ -28,6 +28,16 @@ public class LinhaBusiness : ILinhaBusiness
         return linha;
     }
 
+    public Linha GetLinhaPorId(int id)
+    {
+        var linha = _linhaRepository.GetById(id);
+        if (linha is null)
+        {
+            throw new Exception("Linha não encontrada");
+        }
+        return linha;
+    }
+
     public Linha PostLinha(Linha linha)
     {
         try
@@ -40,6 +50,46 @@ public class LinhaBusiness : ILinhaBusiness
         catch (Exception ex)
         {
             throw new Exception("Erro ao criar linha: " + ex.Message);
+        }
+    }
+
+    public void DeleteLinhaPorId(int id)
+    {
+        try
+        {
+            var linha = _linhaRepository.GetById(id);
+
+            if(linha is null)
+            {
+                throw new Exception("Linha não encontrada");
+            }
+
+            _linhaRepository.DeleteById(id);
+        }
+        catch(Exception ex)
+        {
+            throw;
+        }
+    }
+
+    public Linha AtualizarLinha(int id)
+    {
+        try
+        {
+            var linhaAtualizacao = _linhaRepository.GetById(id);
+
+            if(linhaAtualizacao is null)
+            {
+                throw new Exception("Linha não encontrada");
+            }
+
+            _linhaRepository.Update(linhaAtualizacao);
+
+            return linhaAtualizacao;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Erro ao atualizar linha: " + ex.Message);
         }
     }
 }

@@ -54,6 +54,9 @@ builder.Services.AddDbContext<PlanoRevisaoApiContext>(options =>
 
 builder.Services.AddScoped<ILinhaRepository, LinhaRepository>();
 builder.Services.AddScoped<ILinhaBusiness, LinhaBusiness>();
+
+builder.Services.AddScoped<IPlanoRevisaoRepository, PlanoRevisaoRepository>();
+builder.Services.AddScoped<IPlanoRevisaoBusiness, PlanoRevisaoBusiness>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 

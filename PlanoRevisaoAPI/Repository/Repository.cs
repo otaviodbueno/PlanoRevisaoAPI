@@ -43,6 +43,15 @@ public class Repository<T> : IRepository<T> where T : class
         SaveChanges();
     }
 
+    public void DeleteById(int id)
+    {
+        var entity = GetById(id);
+        if (entity != null)
+        {
+            Delete(entity);
+        }
+    }
+
     public T Update(T entity)
     {
         _context.Set<T>().Update(entity);

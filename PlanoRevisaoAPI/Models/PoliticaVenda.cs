@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace PlanoRevisaoAPI.Models;
 
@@ -9,9 +10,10 @@ namespace PlanoRevisaoAPI.Models;
 public class PoliticaVenda
 {
     [Key]
-    public int IdPoliticaVenda { get; set; }
+    public int ID_POLITICA_VENDA { get; set; }
 
-    public string? DsPoliticaVenda { get; set; }
+    public string? DS_POLITICA_VENDA { get; set; }
 
-    public virtual ICollection<PlanoRevisao> Planorevisaos { get; set; }
+    [JsonIgnore]
+    public virtual ICollection<PlanoRevisao> Planorevisao { get; set; }
 }

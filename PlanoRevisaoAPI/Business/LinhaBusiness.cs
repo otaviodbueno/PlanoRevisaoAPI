@@ -1,4 +1,5 @@
 ﻿using PlanoRevisaoAPI.Models;
+using PlanoRevisaoAPI.ModelView;
 using PlanoRevisaoAPI.Repository;
 
 namespace PlanoRevisaoAPI.Business;
@@ -16,7 +17,7 @@ public class LinhaBusiness : ILinhaBusiness
         return _linhaRepository.GetAll().ToList();
     }
 
-    public List<Linha> Get(string nome)
+    public List<LinhaModelView> Get(string nome)
     {
         var linha = _linhaRepository.Get(x => x.NM_LINHA == nome).ToList();
 
@@ -25,7 +26,7 @@ public class LinhaBusiness : ILinhaBusiness
             throw new Exception("Linha não encontrada");
         }
         
-        return linha;
+        return linha.Select(x => Map(x)).ToList();
     }
 
     public Linha GetLinhaPorId(int id)
@@ -38,14 +39,16 @@ public class LinhaBusiness : ILinhaBusiness
         return linha;
     }
 
-    public Linha PostLinha(Linha linha)
+    public Linha PostLinha(LinhaModelView linha)
     {
         try
         {
             if (linha == null)
                 return null;
 
-            return _linhaRepository.Create(linha);
+            var linhaCriacao = Map(linha);
+
+            return _linhaRepository.Create(linhaCriacao);
         }
         catch (Exception ex)
         {
@@ -72,16 +75,18 @@ public class LinhaBusiness : ILinhaBusiness
         }
     }
 
-    public Linha AtualizarLinha(int id)
+    public Linha AtualizarLinha(LinhaModelView linha)
     {
         try
         {
-            var linhaAtualizacao = _linhaRepository.GetById(id);
+            var linhaExiste = _linhaRepository.GetById(linha.IdLinha);
 
-            if(linhaAtualizacao is null)
+            if(linhaExiste is null)
             {
                 throw new Exception("Linha não encontrada");
             }
+
+            var linhaAtualizacao = Map(linha);
 
             _linhaRepository.Update(linhaAtualizacao);
 
@@ -91,5 +96,27 @@ public class LinhaBusiness : ILinhaBusiness
         {
             throw new Exception("Erro ao atualizar linha: " + ex.Message);
         }
+    }
+
+    public Linha Map(LinhaModelView linha)
+    {
+        return new Linha
+        {
+            ID_LINHA = linha.IdLinha,
+            CD_LINHA = linha.CdLinha,
+            NM_LINHA = linha.NmLinha,
+            IN_ATIVO = linha.InAtivo == 1 ? true : false
+        };
+    }
+
+    public LinhaModelView Map(Linha linha)
+    {
+        return new LinhaModelView
+        {
+            IdLinha = linha.ID_LINHA,
+            CdLinha = linha.CD_LINHA,
+            NmLinha = linha.NM_LINHA,
+            InAtivo = linha.IN_ATIVO == true ? (short)1 : (short)0
+        };
     }
 }

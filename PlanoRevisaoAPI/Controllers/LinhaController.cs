@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PlanoRevisaoAPI.Business;
 using PlanoRevisaoAPI.Models;
+using PlanoRevisaoAPI.ModelView;
 using PlanoRevisaoAPI.Repository;
 
 
@@ -18,35 +19,35 @@ public class LinhaController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<List<Linha>> Get()
+    public ActionResult<List<LinhaModelView>> Get()
     {
         var linhas = _linhaBusiness.GetLinhas();
         return Ok(linhas);
     }
 
     [HttpGet("GetPorNome")]
-    public ActionResult<List<Linha>> Get(string nome)
+    public ActionResult<List<LinhaModelView>> Get(string nome)
     {
         var linhas = _linhaBusiness.Get(nome);
         return Ok(linhas);
     }
 
     [HttpPost]
-    public ActionResult<Linha> Post(Linha linha)
+    public ActionResult<Linha> Post(LinhaModelView linha)
     {
         _linhaBusiness.PostLinha(linha);
-        return Ok(linha);
+        return Created("", linha);
     }
 
-    [HttpPut("id")]
-    public ActionResult<Linha> PutLinha(int id)
+    [HttpPut]
+    public ActionResult<Linha> PutLinha(LinhaModelView linha)
     {
-        var linha = _linhaBusiness.AtualizarLinha(id);
+        var linhaAtualizada = _linhaBusiness.AtualizarLinha(linha);
         return Created("", linha);
     }
 
     [HttpDelete("{id}")]
-    public ActionResult DeletarLinhaPorId(int id)
+    public ActionResult DeletarLinhaPorId(int id) //To Do LInha modelView
     {
        _linhaBusiness.DeleteLinhaPorId(id);
         return NoContent();

@@ -7,10 +7,12 @@ public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
 {
     private readonly IPlanoRevisaoRepository _planoRevisaoRepository;
     private readonly ILinhaBusiness _linhaBusiness;
-    public PlanoRevisaoBusiness(IPlanoRevisaoRepository planoRevisaoRepository, ILinhaBusiness linhaBusinnes)
+    private readonly IPoliticaVendaRepository _politicaVendaRepository;
+    public PlanoRevisaoBusiness(IPlanoRevisaoRepository planoRevisaoRepository, ILinhaBusiness linhaBusinnes, IPoliticaVendaRepository politicaVendaRepository)
     {
         _planoRevisaoRepository = planoRevisaoRepository;
         _linhaBusiness = linhaBusinnes;
+        _politicaVendaRepository = politicaVendaRepository;
     }
 
     public List<PlanoRevisao> GetPlanosRevisao()
@@ -78,7 +80,11 @@ public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
             throw new Exception("Datas de vigências inválidas!");
         }
 
-        //TO DO
-        //var politicaVenda =
+        var politicaVenda = _politicaVendaRepository.Get(x => x.ID_POLITICA_VENDA == planoRevisao.ID_POLITICA_VENDA);
+
+        if(politicaVenda is null)
+        {
+            throw new Exception("Politica de venda não existe!");
+        }
     }
 }

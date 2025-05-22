@@ -5,10 +5,10 @@ namespace PlanoRevisaoAPI.Business;
 
 public interface ILinhaBusiness
 {
-    Linha AtualizarLinha(LinhaModelView linha);
-    List<Linha> GetLinhas();
+    LinhaModelView AtualizarLinha(LinhaModelView linha);
+    List<LinhaModelView> GetLinhas();
     List<LinhaModelView> Get(string nome);
-    Linha GetLinhaPorId(int id);
+    LinhaModelView GetLinhaPorId(int id);
     Linha PostLinha(LinhaModelView linha);
     void DeleteLinhaPorId(int id);
 }

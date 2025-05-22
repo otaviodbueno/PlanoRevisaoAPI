@@ -25,7 +25,7 @@ public class Repository<T> : IRepository<T> where T : class
         return _context.Set<T>().AsNoTracking().ToList();
     }
 
-    public IEnumerable<T> Get(Func<T, bool> predicate)
+    public IEnumerable<T> Get(Expression<Func<T, bool>> predicate)
     {
         return _context.Set<T>().AsNoTracking().Where(predicate).ToList();
     }
@@ -54,7 +54,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public T Update(T entity)
     {
-        _context.Set<T>().Update(entity);
+        _context.Entry(entity).State = EntityState.Modified;
         SaveChanges();
         return entity;
     }

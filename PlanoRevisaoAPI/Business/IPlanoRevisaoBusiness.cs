@@ -1,10 +1,14 @@
 ﻿using PlanoRevisaoAPI.Models;
+using PlanoRevisaoAPI.ModelView;
 
 namespace PlanoRevisaoAPI.Business
 {
     public interface IPlanoRevisaoBusiness
     {
-        PlanoRevisao GetPlanoRevisaoPorId(int id);
-        PlanoRevisao PostPlanoRevisao(PlanoRevisao planoRevisao);
+        List<PlanoRevisaoModelView> GetPlanosRevisao();
+        PlanoRevisaoModelView GetPlanoRevisaoPorId(int id);
+        PlanoRevisao PostPlanoRevisao(PlanoRevisaoModelView planoRevisao);
+        PlanoRevisaoModelView AtualizarPlanoRevisao(PlanoRevisaoModelView planoRevisao);
+        PlanoRevisaoModelView DeletarPlanoRevisao(int id);
     }
 }

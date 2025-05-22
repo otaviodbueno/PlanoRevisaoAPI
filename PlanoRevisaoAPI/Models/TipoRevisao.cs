@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace PlanoRevisaoAPI.Models;
 
@@ -9,15 +10,16 @@ namespace PlanoRevisaoAPI.Models;
 public class TipoRevisao
 {
     [Key]
-    public int IdTipoRevisao { get; set; }
+    public int ID_TIPO_REVISAO { get; set; }
 
-    public string NmRevisao { get; set; }
+    public string NM_REVISAO { get; set; }
 
-    public DateTime? DtInclusao { get; set; }
+    public DateTime? DT_INCLUSAO { get; set; }
 
-    public bool InAtivo { get; set; }
+    public bool IN_ATIVO { get; set; }
 
-    public decimal NuRevisao { get; set; }
+    public decimal NU_REVISAO { get; set; }
 
-    public virtual ICollection<PlanoRevisaoTipo> PlanoRevisaoTipo { get; set; }
+    [JsonIgnore]
+    public virtual ICollection<PlanoRevisaoTipo>? PlanoRevisaoTipo { get; set; }
 }

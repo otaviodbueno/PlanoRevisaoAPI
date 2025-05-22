@@ -9,19 +9,20 @@ namespace PlanoRevisaoAPI.Models;
 public partial class PlanoRevisaoPreco
 {
     [Key]
-    public int IdPlanoRevisaoPreco { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int ID_PLANO_REVISAO_PRECO { get; set; }
 
-    public int IdPlanoRevisaoTipo { get; set; }
+    public int ID_PLANO_REVISAO_TIPO { get; set; }
 
-    public int IdEmpresaRegiao { get; set; }
+    public int ID_EMPRESA_REGIAO { get; set; }
 
-    public DateTime DtVigenciaInicial { get; set; }
+    public DateTime DT_VIGENCIA_INICIAL { get; set; }
 
-    public DateTime DtVigenciaFinal { get; set; }
+    public DateTime DT_VIGENCIA_FINAL { get; set; }
 
-    [ForeignKey("IdEmpresaRegiao")]
+    [ForeignKey("ID_EMPRESA_REGIAO")]
     public virtual EmpresaRegiao EmpresaRegiao { get; set; }
 
-    [ForeignKey("IdPlanoRevisaoTipo")]
+    [ForeignKey("ID_PLANO_REVISAO_TIPO")]
     public virtual PlanoRevisaoTipo PlanoRevisaoTipo { get; set; }
 }

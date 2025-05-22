@@ -1,4 +1,6 @@
-﻿using PlanoRevisaoAPI.Models;
+﻿using Microsoft.Identity.Client;
+using PlanoRevisaoAPI.Models;
+using PlanoRevisaoAPI.ModelView;
 using PlanoRevisaoAPI.Repository;
 
 namespace PlanoRevisaoAPI.Business;
@@ -15,12 +17,18 @@ public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
         _politicaVendaRepository = politicaVendaRepository;
     }
 
-    public List<PlanoRevisao> GetPlanosRevisao()
+    public List<PlanoRevisaoModelView> GetPlanosRevisao()
     {
-        return _planoRevisaoRepository.GetAll().ToList();
+        var planos = _planoRevisaoRepository.GetAll().ToList();
+        if (planos is null || planos.Count == 0)
+        {
+            throw new Exception("Nenhum plano de revisão encontrado");
+        }
+
+        return planos.Select(x => Map(x)).ToList();
     }
 
-    public PlanoRevisao GetPlanoRevisaoPorId(int id)
+    public PlanoRevisaoModelView GetPlanoRevisaoPorId(int id)
     {
         var planoRevisao = _planoRevisaoRepository.GetById(id);
 
@@ -29,21 +37,50 @@ public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
             throw new Exception("Plano de Revisão não encontrado");
         }
 
-        return planoRevisao;
+        return Map(planoRevisao);
     }
 
-    public PlanoRevisao PostPlanoRevisao(PlanoRevisao planoRevisao)
+    public PlanoRevisao PostPlanoRevisao(PlanoRevisaoModelView planoRevisao)
     {
         try
         {
             ValidaPlanoRevisao(planoRevisao);
-            return _planoRevisaoRepository.Create(planoRevisao);
+            var planoRevisaoInclusao = Map(planoRevisao);
+            return _planoRevisaoRepository.Create(planoRevisaoInclusao);
 
         }
         catch (Exception ex)
         {
             throw new Exception("Erro ao inserir o plano de revisão: " + ex.Message);
         }
+    }
+
+    public PlanoRevisaoModelView AtualizarPlanoRevisao(PlanoRevisaoModelView planoRevisao)
+    {
+        ValidaPlanoRevisao(planoRevisao, false);
+
+        var planoAtualizacao = Map(planoRevisao);
+
+        bool planoExiste = _planoRevisaoRepository.Get(x => x.ID_PLANO_REVISAO == planoRevisao.IdPlanoRevisao).Any();
+
+        if (!planoExiste)
+            throw new Exception("Plano de revisão não existe!");
+
+        var planoAtualizado = _planoRevisaoRepository.Update(planoAtualizacao);
+
+        return Map(planoAtualizado);
+    }
+
+    public PlanoRevisaoModelView DeletarPlanoRevisao(int id)
+    {
+        var planoDeletar = _planoRevisaoRepository.GetById(id);
+        if (planoDeletar is null)
+        {
+            throw new Exception("Plano de Revisão não encontrado para deletar!");
+        }
+
+        _planoRevisaoRepository.Delete(planoDeletar);
+        return Map(planoDeletar);
     }
 
     private bool VerificaVigencias(DateTime? dtVigenciaInicial, DateTime? dtVigenciaFinal)
@@ -57,34 +94,66 @@ public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
         return true;
     }
 
-    private void ValidaPlanoRevisao(PlanoRevisao planoRevisao)
+    private void ValidaPlanoRevisao(PlanoRevisaoModelView planoRevisao, bool insert = true)
     {
-        var planoRevisaoExistente = _planoRevisaoRepository.Get(x => x.DS_PLANO_REVISAO == planoRevisao.DS_PLANO_REVISAO);
+        var descricao = planoRevisao.DsPlanoRevisao;
 
-        if (planoRevisaoExistente.Any())
+        var planoRevisaoExistente = _planoRevisaoRepository.Get(x => x.DS_PLANO_REVISAO == descricao);
+
+        if (planoRevisaoExistente.Count() > 0 && insert) // Não deve validar a existência quando for update, sempre irá existir
         {
             throw new Exception("Plano de Revisão já existe!");
         }
 
-        var linha = _linhaBusiness.GetLinhaPorId(planoRevisao.ID_LINHA);
+        var linha = _linhaBusiness.GetLinhaPorId(planoRevisao.IdLinha);
 
         if (linha is null)
         {
             throw new Exception("Linha vinculada ao plano não existe!");
         }
 
-        var vigenciasValidas = VerificaVigencias(planoRevisao.DT_VIGENCIA_INICIAL, planoRevisao.DT_VIGENCIA_FINAL);
+        var vigenciasValidas = VerificaVigencias(planoRevisao.DtVigenciaInicial, planoRevisao.DtVigenciaFinal);
 
         if (!vigenciasValidas)
         {
             throw new Exception("Datas de vigências inválidas!");
         }
 
-        var politicaVenda = _politicaVendaRepository.Get(x => x.ID_POLITICA_VENDA == planoRevisao.ID_POLITICA_VENDA);
+        var politicaVenda = _politicaVendaRepository.Get(x => x.ID_POLITICA_VENDA == planoRevisao.IdPoliticaVenda);
 
         if(politicaVenda is null)
         {
             throw new Exception("Politica de venda não existe!");
         }
+    }
+
+   private PlanoRevisao Map(PlanoRevisaoModelView planorevisao)
+    {
+        return new PlanoRevisao
+        {
+            ID_PLANO_REVISAO = planorevisao.IdPlanoRevisao,
+            DS_PLANO_REVISAO = planorevisao.DsPlanoRevisao,
+            ID_LINHA = planorevisao.IdLinha,
+            DT_INCLUSAO = DateTime.Now,
+            DT_VIGENCIA_INICIAL = planorevisao.DtVigenciaInicial,
+            DT_VIGENCIA_FINAL = planorevisao.DtVigenciaFinal,
+            NU_MESES_GARANTIA = planorevisao.NuMesesGarantia,
+            ID_POLITICA_VENDA = planorevisao.IdPoliticaVenda
+        };
+    }
+
+    private PlanoRevisaoModelView Map(PlanoRevisao planorevisao)
+    {
+        return new PlanoRevisaoModelView
+        {
+            IdPlanoRevisao = planorevisao.ID_PLANO_REVISAO,
+            DsPlanoRevisao = planorevisao.DS_PLANO_REVISAO,
+            IdLinha = planorevisao.ID_LINHA,
+            DtInclusao = planorevisao.DT_INCLUSAO,
+            DtVigenciaInicial = planorevisao.DT_VIGENCIA_INICIAL,
+            DtVigenciaFinal = planorevisao.DT_VIGENCIA_FINAL,
+            NuMesesGarantia = planorevisao.NU_MESES_GARANTIA,
+            IdPoliticaVenda = planorevisao.ID_POLITICA_VENDA
+        };
     }
 }

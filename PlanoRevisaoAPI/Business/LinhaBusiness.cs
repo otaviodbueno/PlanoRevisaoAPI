@@ -12,9 +12,9 @@ public class LinhaBusiness : ILinhaBusiness
         _linhaRepository = linhaRepository;
     }
 
-    public List<Linha> GetLinhas()
+    public List<LinhaModelView> GetLinhas()
     {
-        return _linhaRepository.GetAll().ToList();
+        return _linhaRepository.GetAll().Select(x => Map(x)).ToList();
     }
 
     public List<LinhaModelView> Get(string nome)
@@ -29,14 +29,14 @@ public class LinhaBusiness : ILinhaBusiness
         return linha.Select(x => Map(x)).ToList();
     }
 
-    public Linha GetLinhaPorId(int id)
+    public LinhaModelView GetLinhaPorId(int id)
     {
         var linha = _linhaRepository.GetById(id);
         if (linha is null)
         {
             throw new Exception("Linha não encontrada");
         }
-        return linha;
+        return Map(linha);
     }
 
     public Linha PostLinha(LinhaModelView linha)
@@ -75,13 +75,13 @@ public class LinhaBusiness : ILinhaBusiness
         }
     }
 
-    public Linha AtualizarLinha(LinhaModelView linha)
+    public LinhaModelView AtualizarLinha(LinhaModelView linha)
     {
         try
         {
-            var linhaExiste = _linhaRepository.GetById(linha.IdLinha);
+            var linhaExiste = _linhaRepository.Get(x => x.ID_LINHA == linha.IdLinha).Any();
 
-            if(linhaExiste is null)
+            if(!linhaExiste)
             {
                 throw new Exception("Linha não encontrada");
             }
@@ -90,7 +90,7 @@ public class LinhaBusiness : ILinhaBusiness
 
             _linhaRepository.Update(linhaAtualizacao);
 
-            return linhaAtualizacao;
+            return Map(linhaAtualizacao);
         }
         catch (Exception ex)
         {

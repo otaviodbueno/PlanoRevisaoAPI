@@ -13,9 +13,10 @@ namespace PlanoRevisaoAPI.Models;
 public class PlanoRevisao
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int ID_PLANO_REVISAO { get; set; }
 
-    public string DS_PLANO_REVISAO { get; set; }
+    public string? DS_PLANO_REVISAO { get; set; }
 
     public int ID_LINHA { get; set; }
 
@@ -29,14 +30,14 @@ public class PlanoRevisao
 
     public int ID_POLITICA_VENDA { get; set; }
 
-    [ForeignKey("IdLinha")]
+    [ForeignKey("ID_PLANO_REVISAO")]
     [JsonIgnore]
-    public virtual Linha Linha { get; set; }
+    public virtual Linha? Linha { get; set; }
 
-    [ForeignKey("IdPoliticaVenda")]
+    [ForeignKey("ID_POLITICA_VENDA")]
     [JsonIgnore]
-    public virtual PoliticaVenda PoliticaVenda { get; set; }
+    public virtual PoliticaVenda? PoliticaVenda { get; set; }
 
     [JsonIgnore]
-    public virtual ICollection<PlanoRevisaoTipo> PlanoRevisaoTipo { get; set; }
+    public virtual ICollection<PlanoRevisaoTipo>? PlanoRevisaoTipo { get; set; }
 }

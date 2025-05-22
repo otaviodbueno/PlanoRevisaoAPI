@@ -10,21 +10,22 @@ namespace PlanoRevisaoAPI.Models;
 public class PlanoRevisaoTipo
 {
     [Key]
-    public int IdPlanoRevisaoTipo { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int ID_PLANO_REVISAO_TIPO { get; set; }
 
-    public int IdTipoRevisao { get; set; }
+    public int ID_TIPO_REVISAO { get; set; }
 
-    public int IdPlanoRevisao { get; set; }
+    public int ID_PLANO_REVISAO { get; set; }
 
-    public decimal? UnidadeMaoDeObra { get; set; }
+    public decimal? UNIDADE_MAO_DE_OBRA { get; set; }
 
-    public string? InReembolsar { get; set; }
+    public string? IN_REEMBOLSAR { get; set; }
 
-    [ForeignKey("IdPlanoRevisao")]
-    public virtual PlanoRevisao PlanoRevisao { get; set; }
+    [ForeignKey("ID_PLANO_REVISAO")]
+    public virtual PlanoRevisao? PlanoRevisao { get; set; }
 
-    [ForeignKey("IdTipoRevisao")]
-    public virtual TipoRevisao TipoRevisao { get; set; }
+    [ForeignKey("ID_TIPO_REVISAO")]
+    public virtual TipoRevisao? TipoRevisao { get; set; }
 
-    public virtual ICollection<PlanoRevisaoPreco> PlanoRevisaoPreco { get; set; }
+    public virtual ICollection<PlanoRevisaoPreco>? PlanoRevisaoPreco { get; set; }
 }

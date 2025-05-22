@@ -57,6 +57,7 @@ builder.Services.AddScoped<ILinhaBusiness, LinhaBusiness>();
 
 builder.Services.AddScoped<IPlanoRevisaoRepository, PlanoRevisaoRepository>();
 builder.Services.AddScoped<IPlanoRevisaoBusiness, PlanoRevisaoBusiness>();
+builder.Services.AddScoped<IPoliticaVendaRepository, PoliticaVendaRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 

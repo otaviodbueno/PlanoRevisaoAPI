@@ -25,10 +25,10 @@ public class LinhaController : ControllerBase
         return Ok(linhas);
     }
 
-    [HttpGet("GetPorNome")]
-    public ActionResult<List<LinhaModelView>> Get(string nome)
+    [HttpGet("GetPorId")]
+    public ActionResult<LinhaModelView> Get(int id)
     {
-        var linhas = _linhaBusiness.Get(nome);
+        var linhas = _linhaBusiness.GetLinhaPorId(id);
         return Ok(linhas);
     }
 

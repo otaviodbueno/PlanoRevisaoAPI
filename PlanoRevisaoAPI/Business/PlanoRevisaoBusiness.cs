@@ -96,9 +96,7 @@ public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
 
     private void ValidaPlanoRevisao(PlanoRevisaoModelView planoRevisao, bool insert = true)
     {
-        var descricao = planoRevisao.DsPlanoRevisao;
-
-        var planoRevisaoExistente = _planoRevisaoRepository.Get(x => x.DS_PLANO_REVISAO == descricao);
+        var planoRevisaoExistente = _planoRevisaoRepository.Get(x => x.DS_PLANO_REVISAO == planoRevisao.DsPlanoRevisao);
 
         if (planoRevisaoExistente.Count() > 0 && insert) // Não deve validar a existência quando for update, sempre irá existir
         {

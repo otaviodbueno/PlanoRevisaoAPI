@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using PlanoRevisaoAPI.Business;
+using PlanoRevisaoAPI.ModelView;
 
 namespace PlanoRevisaoAPI.Controllers
 {
@@ -8,11 +8,18 @@ namespace PlanoRevisaoAPI.Controllers
     [ApiController]
     public class PlanoRevisaoTipoController : ControllerBase
     {
-        // GET: api/<PlanoRevisaoTipoController>
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private readonly IPlanoRevisaoTipoBusiness _planoRevisaoTipoBusiness;
+
+        public PlanoRevisaoTipoController(IPlanoRevisaoTipoBusiness planoRevisaoTipoBusiness)
         {
-            return new string[] { "value1", "value2" };
+            _planoRevisaoTipoBusiness = planoRevisaoTipoBusiness;
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult<List<PlanoRevisaoTipoModelView>> GetPorIdPlanoRevisao(int id)
+        {
+            var tiposPlanoRevisao = _planoRevisaoTipoBusiness.GetById(id);
+            return Ok(tiposPlanoRevisao);
         }
     }
 }

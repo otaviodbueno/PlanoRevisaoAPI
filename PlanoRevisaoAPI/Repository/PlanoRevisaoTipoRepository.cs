@@ -8,4 +8,11 @@ public class PlanoRevisaoTipoRepository : Repository<PlanoRevisaoTipo>, IPlanoRe
     public PlanoRevisaoTipoRepository(PlanoRevisaoApiContext context) : base(context)
     {
     }
+
+    public List<PlanoRevisaoTipo> GetByIdPlanoRevisao(int idPlanoRevisao)
+    {
+        return _context.PlanoRevisaoTipo
+            .Where(x => x.ID_PLANO_REVISAO == idPlanoRevisao)
+            .ToList();
+    }
 }

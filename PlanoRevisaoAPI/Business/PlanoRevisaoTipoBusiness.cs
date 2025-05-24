@@ -14,18 +14,26 @@ public class PlanoRevisaoTipoBusiness : IPlanoRevisaoTipoBusiness
     }
 
 
-    public PlanoRevisaoTipoModelView GetAll()
+    public PlanoRevisaoTipoModelView GetById(int idPlanoRevisao)
     {
-        var planoRevisaoTipo = _planoRevisaoTipoRepository.GetAll().OrderBy(x => x.ID_PLANO_REVISAO).ToList();
-        return Map(planoRevisaoTipo);
+        var planoRevisaoTipo = _planoRevisaoTipoRepository.GetByIdPlanoRevisao(idPlanoRevisao);
+        return MapPorPlanoUnico(planoRevisaoTipo);
     }
 
 
-    private PlanoRevisaoTipoModelView Map(List<PlanoRevisaoTipo> planoRevisaoTipo)
+    private PlanoRevisaoTipoModelView MapPorPlanoUnico(List<PlanoRevisaoTipo> planoRevisaoTipo)
     {
+        if(planoRevisaoTipo == null || planoRevisaoTipo.Count == 0)
+           throw new ArgumentException("A lista de tipos de revisão está vazia.");
+
+        var idPlanoRevisao = planoRevisaoTipo[0].ID_PLANO_REVISAO;
+
+        if (planoRevisaoTipo.Any(x => x.ID_PLANO_REVISAO != idPlanoRevisao))
+            throw new InvalidOperationException("Todos os tipos de revisão devem pertencer ao mesmo plano.");
+
         return new PlanoRevisaoTipoModelView
         {
-            IdPlanoRevisao = planoRevisaoTipo[0].ID_PLANO_REVISAO,
+            IdPlanoRevisao = idPlanoRevisao,
             TiposRevisao = planoRevisaoTipo.Select(x => new TipoRevisaoRequestModelView
             {
                 IdTipoRevisao = x.ID_TIPO_REVISAO,

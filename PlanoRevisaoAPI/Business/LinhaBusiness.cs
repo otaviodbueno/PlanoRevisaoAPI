@@ -7,9 +7,15 @@ namespace PlanoRevisaoAPI.Business;
 public class LinhaBusiness : ILinhaBusiness
 {
     private readonly ILinhaRepository _linhaRepository;
-    public LinhaBusiness(ILinhaRepository linhaRepository)
+    private readonly IPlanoRevisaoRepository _planoRevisaoRepository;
+    private readonly IPlanoRevisaoTipoRepository _planoRevisaoTipoRepository;
+    public LinhaBusiness(ILinhaRepository linhaRepository, 
+                        IPlanoRevisaoRepository planoRevisaoRepository,
+                        IPlanoRevisaoTipoRepository planoRevisaoTipoRepository)
     {
         _linhaRepository = linhaRepository;
+        _planoRevisaoRepository = planoRevisaoRepository;
+        _planoRevisaoTipoRepository = planoRevisaoTipoRepository;
     }
 
     public List<LinhaModelView> GetLinhas()
@@ -67,6 +73,13 @@ public class LinhaBusiness : ILinhaBusiness
                 throw new Exception("Linha não encontrada");
             }
 
+            var linhaPlanoRevisao = _planoRevisaoRepository.Get(x => x.ID_LINHA == id).ToList();
+
+            if (linhaPlanoRevisao.Any())
+            {
+                throw new Exception("Não é possível excluir a linha, pois ela está associada a um ou mais planos de revisão.");
+            }
+
             _linhaRepository.DeleteById(id);
         }
         catch(Exception ex)
@@ -90,7 +103,7 @@ public class LinhaBusiness : ILinhaBusiness
 
             _linhaRepository.Update(linhaAtualizacao);
 
-            return Map(linhaAtualizacao);
+            return linha;
         }
         catch (Exception ex)
         {

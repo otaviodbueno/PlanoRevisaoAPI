@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
+using PlanoRevisaoAPI;
 using PlanoRevisaoAPI.Business;
 using PlanoRevisaoAPI.Context;
 using PlanoRevisaoAPI.Repository;
@@ -58,6 +59,12 @@ builder.Services.AddScoped<ILinhaBusiness, LinhaBusiness>();
 builder.Services.AddScoped<IPlanoRevisaoRepository, PlanoRevisaoRepository>();
 builder.Services.AddScoped<IPlanoRevisaoBusiness, PlanoRevisaoBusiness>();
 
+builder.Services.AddScoped<IPlanoRevisaoTipoRepository, PlanoRevisaoTipoRepository>();
+builder.Services.AddScoped<IPlanoRevisaoTipoBusiness, PlanoRevisaoTipoBusiness>();
+
+builder.Services.AddScoped<ITipoRevisaoRepository, TipoRevisaoRepository>();
+builder.Services.AddScoped<ITipoRevisaoBusiness, TipoRevisaoBusiness>();
+
 builder.Services.AddScoped<IPoliticaVendaRepository, PoliticaVendaRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
@@ -70,6 +77,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseGlobalExceptionMiddleware();
 
 app.UseHttpsRedirection();
 

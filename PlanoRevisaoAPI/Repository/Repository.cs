@@ -49,6 +49,7 @@ public class Repository<T> : IRepository<T> where T : class
         if (entity != null)
         {
             Delete(entity);
+            SaveChanges();
         }
     }
 

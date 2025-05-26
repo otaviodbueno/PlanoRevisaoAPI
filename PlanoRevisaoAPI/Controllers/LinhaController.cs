@@ -47,7 +47,7 @@ public class LinhaController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public ActionResult DeletarLinhaPorId(int id) //To Do LInha modelView
+    public ActionResult DeletarLinhaPorId(int id)
     {
        _linhaBusiness.DeleteLinhaPorId(id);
         return NoContent();

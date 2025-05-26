@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace PlanoRevisaoAPI.Models;
 
@@ -21,8 +22,10 @@ public partial class PlanoRevisaoPreco
     public DateTime DT_VIGENCIA_FINAL { get; set; }
 
     [ForeignKey("ID_EMPRESA_REGIAO")]
+    [JsonIgnore]
     public virtual EmpresaRegiao EmpresaRegiao { get; set; }
 
     [ForeignKey("ID_PLANO_REVISAO_TIPO")]
+    [JsonIgnore]
     public virtual PlanoRevisaoTipo PlanoRevisaoTipo { get; set; }
 }

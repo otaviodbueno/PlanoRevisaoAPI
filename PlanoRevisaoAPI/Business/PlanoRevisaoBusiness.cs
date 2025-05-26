@@ -8,13 +8,18 @@ namespace PlanoRevisaoAPI.Business;
 public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
 {
     private readonly IPlanoRevisaoRepository _planoRevisaoRepository;
+    private readonly IPlanoRevisaoTipoRepository _planoRevisaoTipoRepository;
     private readonly ILinhaBusiness _linhaBusiness;
     private readonly IPoliticaVendaRepository _politicaVendaRepository;
-    public PlanoRevisaoBusiness(IPlanoRevisaoRepository planoRevisaoRepository, ILinhaBusiness linhaBusinnes, IPoliticaVendaRepository politicaVendaRepository)
+    public PlanoRevisaoBusiness(IPlanoRevisaoRepository planoRevisaoRepository, 
+                                ILinhaBusiness linhaBusinnes, 
+                                IPoliticaVendaRepository politicaVendaRepository, 
+                                IPlanoRevisaoTipoRepository planoRevisaoTipoRepository)
     {
         _planoRevisaoRepository = planoRevisaoRepository;
         _linhaBusiness = linhaBusinnes;
         _politicaVendaRepository = politicaVendaRepository;
+        _planoRevisaoTipoRepository = planoRevisaoTipoRepository;
     }
 
     public List<PlanoRevisaoModelView> GetPlanosRevisao()
@@ -77,6 +82,13 @@ public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
         if (planoDeletar is null)
         {
             throw new Exception("Plano de Revisão não encontrado para deletar!");
+        }
+
+        var planoRevisaoTipo = _planoRevisaoTipoRepository.Get(x => x.ID_PLANO_REVISAO == id).ToList();
+
+        if(planoRevisaoTipo != null && planoRevisaoTipo.Count > 0)
+        {
+            throw new Exception("Não é possível deletar o plano de revisão, existem tipos vinculados a ele!");
         }
 
         _planoRevisaoRepository.Delete(planoDeletar);

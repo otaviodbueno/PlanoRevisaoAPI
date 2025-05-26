@@ -15,4 +15,14 @@ public class PlanoRevisaoTipoRepository : Repository<PlanoRevisaoTipo>, IPlanoRe
             .Where(x => x.ID_PLANO_REVISAO == idPlanoRevisao)
             .ToList();
     }
+
+    public void PostListTipoPlanoRevisao(List<PlanoRevisaoTipo> listaAdd)
+    {
+        foreach(var item in listaAdd)
+        {
+            _context.PlanoRevisaoTipo.Add(item);
+        }
+
+        _context.SaveChanges();
+    }
 }

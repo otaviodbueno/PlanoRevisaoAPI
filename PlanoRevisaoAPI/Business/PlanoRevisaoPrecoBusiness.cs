@@ -34,6 +34,8 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
             var planoRevisaoPreco = Map(planoRevisaoPrecoModelView, regiao);
             _planoRevisaoPrecoRepository.Create(planoRevisaoPreco);
         }
+
+        return planoRevisaoPrecoModelView;
     }
 
     private PlanoRevisaoPreco Map(PlanoRevisaoPrecoModelView plano, string regiao)

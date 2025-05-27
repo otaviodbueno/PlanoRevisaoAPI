@@ -16,7 +16,7 @@ public partial class PlanoRevisaoApiContext : DbContext
     {
     }
 
-    public virtual DbSet<Empresa> Empresas { get; set; }
+    public virtual DbSet<Empresa> Empresa { get; set; }
 
     public virtual DbSet<EmpresaRegiao> EmpresaRegiao { get; set; }
 
@@ -30,5 +30,5 @@ public partial class PlanoRevisaoApiContext : DbContext
 
     public virtual DbSet<PoliticaVenda> PoliticaVenda { get; set; }
 
-    public virtual DbSet<TipoRevisao> Tiporevisaos { get; set; }
+    public virtual DbSet<TipoRevisao> TipoRevisao { get; set; }
 }

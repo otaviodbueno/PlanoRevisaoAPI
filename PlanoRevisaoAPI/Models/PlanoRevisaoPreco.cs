@@ -17,6 +17,8 @@ public partial class PlanoRevisaoPreco
 
     public int ID_EMPRESA_REGIAO { get; set; }
 
+    public decimal? NU_VALOR { get; set; }
+
     public DateTime DT_VIGENCIA_INICIAL { get; set; }
 
     public DateTime DT_VIGENCIA_FINAL { get; set; }

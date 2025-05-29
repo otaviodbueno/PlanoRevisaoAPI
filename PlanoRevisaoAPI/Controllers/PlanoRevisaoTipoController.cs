@@ -29,6 +29,14 @@ namespace PlanoRevisaoAPI.Controllers
             return Ok(tiposPlanoRevisao);
         }
 
+        [HttpGet]
+        [Route("ListTiposReembolsaveis")]
+        public ActionResult<List<PlanoRevisaoTipoModelView>> ListTiposReembolsaveis()
+        {
+            var tiposPlanoRevisao = _planoRevisaoTipoBusiness.ListPlanoRevisaoTipoReembolsaveis();
+            return Ok(tiposPlanoRevisao);
+        }
+
         [HttpPost]
         public ActionResult<PlanoRevisaoTipoModelView> PostTipoPlanoRevisao(PlanoRevisaoTipoModelView tipos)
         {

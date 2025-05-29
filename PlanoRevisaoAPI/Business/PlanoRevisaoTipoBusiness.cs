@@ -58,6 +58,18 @@ public class PlanoRevisaoTipoBusiness : IPlanoRevisaoTipoBusiness
         return planosAgrupados;
     }
 
+    public List<PlanoRevisaoTipoModelView> ListPlanoRevisaoTipoReembolsaveis()
+    {
+        var todosTipos = GetAllPlanosRevisaoTipo();
+        
+        foreach(var tipo in todosTipos)
+        {
+            tipo.TiposRevisao = tipo.TiposRevisao.Where(t => t.InReembolsar == "S").ToList();
+        }
+
+        return todosTipos;
+    }
+
 
     public PlanoRevisaoTipoModelView PostPlano(PlanoRevisaoTipoModelView tipoPlano)
     {

@@ -62,6 +62,9 @@ builder.Services.AddScoped<IPlanoRevisaoBusiness, PlanoRevisaoBusiness>();
 builder.Services.AddScoped<IPlanoRevisaoTipoRepository, PlanoRevisaoTipoRepository>();
 builder.Services.AddScoped<IPlanoRevisaoTipoBusiness, PlanoRevisaoTipoBusiness>();
 
+builder.Services.AddScoped<IPlanoRevisaoPrecoRepository, PlanoRevisaoPrecoRepository>();
+builder.Services.AddScoped<IPlanoRevisaoPrecoBusiness, PlanoRevisaoPrecoBusiness>();
+
 builder.Services.AddScoped<ITipoRevisaoRepository, TipoRevisaoRepository>();
 builder.Services.AddScoped<ITipoRevisaoBusiness, TipoRevisaoBusiness>();
 

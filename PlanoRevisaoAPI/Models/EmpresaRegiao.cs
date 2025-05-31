@@ -7,14 +7,14 @@ using System.Text.Json.Serialization;
 namespace PlanoRevisaoAPI.Models;
 
 [Table("EMPRESAREGIAO")]
-public partial class EmpresaRegiao
+public class EmpresaRegiao
 {
     [Key]
     public int ID_EMPRESA_REGIAO { get; set; }
     public string? NM_REGIAO { get; set; }
     public string? CD_GRUPO_REGIAO { get; set; }
     [JsonIgnore]
-    public virtual ICollection<Empresa> Empresas { get; set; }
+    public virtual ICollection<Empresa>? Empresas { get; set; }
     [JsonIgnore]
-    public virtual ICollection<PlanoRevisaoPreco> Planorevisaoprecos { get; set; }
+    public virtual ICollection<PlanoRevisaoPreco>? PlanoRevisaoPreco { get; set; }
 }

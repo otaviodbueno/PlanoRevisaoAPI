@@ -6,4 +6,5 @@ public interface IPlanoRevisaoPrecoBusiness
 {
     List<PlanoRevisaoPrecoModelView> ListPrecosVigentes();
     PlanoRevisaoPrecoModelView PostPrecoRevisoes(PlanoRevisaoPrecoModelView planoRevisaoPrecoModelView);
+    PlanoRevisaoPrecoModelView AtualizaValores(PlanoRevisaoPrecoModelView planoPreco);
 }

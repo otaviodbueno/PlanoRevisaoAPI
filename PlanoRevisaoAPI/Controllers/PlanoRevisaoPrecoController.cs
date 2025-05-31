@@ -17,6 +17,13 @@ namespace PlanoRevisaoAPI.Controllers
             _planoRevisaoPrecoBusiness = planoRevisaoPrecoBusiness;
         }
 
+        [HttpGet("ListPrecosVigentes")]
+        public ActionResult<List<PlanoRevisaoPrecoModelView>> GetPrecosVigentes()
+        {
+            var precosVigentes = _planoRevisaoPrecoBusiness.ListPrecosVigentes();
+            return Ok(precosVigentes);
+        }
+
         [HttpPost]
         public ActionResult<PlanoRevisaoPrecoModelView> PostValoresRevisaoPorCdRegiao(PlanoRevisaoPrecoModelView planoRevisaoPrecoModelView)
         {
@@ -24,11 +31,11 @@ namespace PlanoRevisaoAPI.Controllers
             return Created("", post);
         }
 
-        [HttpGet]
-        public ActionResult<List<PlanoRevisaoPrecoModelView>> GetPrecosVigentes()
+        [HttpPut]
+        public ActionResult<PlanoRevisaoPrecoModelView> AtualizarValores(PlanoRevisaoPrecoModelView planoRevisaoPrecoModelView)
         {
-            var precosVigentes = _planoRevisaoPrecoBusiness.ListPrecosVigentes();
-            return Ok(precosVigentes);
+            var put = _planoRevisaoPrecoBusiness.AtualizaValores(planoRevisaoPrecoModelView);
+            return Created("", put);
         }
     }
 }

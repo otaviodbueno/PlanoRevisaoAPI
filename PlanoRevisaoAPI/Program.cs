@@ -68,6 +68,9 @@ builder.Services.AddScoped<IPlanoRevisaoPrecoBusiness, PlanoRevisaoPrecoBusiness
 builder.Services.AddScoped<ITipoRevisaoRepository, TipoRevisaoRepository>();
 builder.Services.AddScoped<ITipoRevisaoBusiness, TipoRevisaoBusiness>();
 
+builder.Services.AddScoped<IEmpresaRegiaoRepository, EmpresaRegiaoRepository>();
+
+
 builder.Services.AddScoped<IPoliticaVendaRepository, PoliticaVendaRepository>();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 

@@ -58,7 +58,7 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
         return planoRevisaoPrecoModelView;
     }
 
-    public List<PlanoRevisaoPrecoModelView> ListPrecosVigentes()
+    public List<PlanoRevisaoPrecoGetModelView> ListPrecosVigentes() 
     {
         var planosPrecosVigentes = _planoRevisaoPrecoRepository.ListPrecosVigentes();
 
@@ -67,17 +67,29 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
             throw new Exception("Nenhum preço vigente encontrado.");
         }
 
-        return planosPrecosVigentes.Select(Map).ToList();
+        return planosPrecosVigentes.Select(MapGet) // Remover os objetos "duplicados", de mesmo cdRegiao
+                                        .GroupBy(p => new {
+                                            p.IdPlanoRevisaoTipo,
+                                            p.CdEmpresaRegiao,
+                                            p.NuValor,
+                                            p.DtVigenciaInicial,
+                                            p.DtVigenciaFinal
+                                        })
+                                        .Select(g => g.First())
+                                        .ToList();
     }
 
     public PlanoRevisaoPrecoModelView AtualizaValores(PlanoRevisaoPrecoModelView planoPreco)
     {
+        /// A Api recebe apenas o cdGrupoRegiao e o id do tipo de revisao, são dados suficientes para selecionar os outros objetos que serão atualizados
+        /// Mesmo recebendo apenas um objeto, poderá atualizar mais, já que um grupo de região pode ter mais de um plano de revisão preço associado a ele
+        /// Exemplo o cd "1,2,5"
+
         ValidarAtualizacao(planoPreco);
 
         var regioes = _empresaRegiaoRepository.Get(x => x.CD_GRUPO_REGIAO == planoPreco.CdEmpresaRegiao).ToList();
 
         var valoresPorRevisaoPorMesmaRegiao = _planoRevisaoPrecoRepository.Get(x => x.ID_PLANO_REVISAO_TIPO == planoPreco.IdPlanoRevisaoTipo && regioes.Select(r => r.ID_EMPRESA_REGIAO).Contains(x.ID_EMPRESA_REGIAO));
-
 
         foreach(var item in valoresPorRevisaoPorMesmaRegiao)
         {
@@ -89,9 +101,9 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
 
     }
 
-    private void ValidarAtualizacao(PlanoRevisaoPrecoModelView planoPreco) // TO DO - ajustar para não precisar usar o ID
+    private void ValidarAtualizacao(PlanoRevisaoPrecoModelView planoPreco) 
     {
-        var planoRevisaoPreco = _planoRevisaoPrecoRepository.Get(x => x.ID_PLANO_REVISAO_PRECO == planoPreco.IdPlanoRevisaoPreco).FirstOrDefault();
+        var planoRevisaoPreco = _planoRevisaoPrecoRepository.GetByRegiaoAndTipo(planoPreco.IdPlanoRevisaoTipo, planoPreco.CdEmpresaRegiao);
 
         if (planoRevisaoPreco is null)
             throw new Exception("Plano de revisão preço não encontrado.");
@@ -133,11 +145,10 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
         };
     }
 
-    private PlanoRevisaoPrecoModelView Map(PlanoRevisaoPrecoEntity planoRevisaoPreco)
+    private PlanoRevisaoPrecoGetModelView MapGet(PlanoRevisaoPrecoEntity planoRevisaoPreco)
     {
-        return new PlanoRevisaoPrecoModelView
+        return new PlanoRevisaoPrecoGetModelView
         {
-            IdPlanoRevisaoPreco = planoRevisaoPreco.IdPlanoRevisaoPreco,
             IdPlanoRevisaoTipo = planoRevisaoPreco.IdPlanoRevisaoTipo,
             CdEmpresaRegiao = planoRevisaoPreco.CdEmpresaRegiao,
             NuValor = planoRevisaoPreco.NuValor,

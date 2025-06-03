@@ -45,6 +45,17 @@ public class LinhaBusiness : ILinhaBusiness
         return Map(linha);
     }
 
+
+    public List<LinhaModelView> ListLinhasAtivas()
+    {
+        var linhasAtivas = _linhaRepository.Get(x => x.IN_ATIVO == true).ToList();
+        if (linhasAtivas is null || !linhasAtivas.Any())
+        {
+            throw new Exception("Nenhuma linha ativa encontrada");
+        }
+        return linhasAtivas.Select(Map).ToList();
+    }
+
     public Linha PostLinha(LinhaModelView linha)
     {
         try

@@ -212,7 +212,6 @@ public class PlanoRevisaoTipoBusiness : IPlanoRevisaoTipoBusiness
         if (tipoRevisaoNoPlano != null && tipoRevisaoNoPlano.Count() != 0)
             throw new Exception($"Tipo de revisão {tipo.IdTipoRevisao} já se encontra no plano {planoRevisao.DS_PLANO_REVISAO}");
 
-
     }
 
     private void ValidatePlanoAtualizacao(PlanoRevisaoTipoModelView planoRevisaoTipoModelView)

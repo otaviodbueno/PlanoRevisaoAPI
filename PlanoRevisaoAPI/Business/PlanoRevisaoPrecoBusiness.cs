@@ -2,6 +2,7 @@
 using PlanoRevisaoAPI.Models;
 using PlanoRevisaoAPI.ModelView;
 using PlanoRevisaoAPI.Repository;
+using System.Collections.Generic;
 
 namespace PlanoRevisaoAPI.Business;
 
@@ -12,8 +13,8 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
     private readonly IPlanoRevisaoRepository _planoRevisaoRepository;
     private readonly IEmpresaRegiaoRepository _empresaRegiaoRepository;
 
-    public PlanoRevisaoPrecoBusiness(IPlanoRevisaoTipoRepository planoRevisaoTipoRepository, 
-                                    IPlanoRevisaoPrecoRepository planoRevisaoPrecoRepository, 
+    public PlanoRevisaoPrecoBusiness(IPlanoRevisaoTipoRepository planoRevisaoTipoRepository,
+                                    IPlanoRevisaoPrecoRepository planoRevisaoPrecoRepository,
                                     IPlanoRevisaoRepository planoRevisaoRepository,
                                     IEmpresaRegiaoRepository empresaRegiaoRepository)
     {
@@ -23,8 +24,10 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
         _empresaRegiaoRepository = empresaRegiaoRepository;
     }
 
-    public List<PlanoRevisaoPrecoModelView> PostPrecoTodasRegioes(List<PlanoRevisaoPrecoModelView> listPrecosPorRegiao)
+    public List<PlanoRevisaoPrecoModelView> PostPrecoRegioes(List<PlanoRevisaoPrecoModelView> listPrecosPorRegiao)
     {
+        VerificaRegiaoDuplicada(listPrecosPorRegiao);
+
         foreach (var planoRevisaoPreco in listPrecosPorRegiao)
         {
             PostPrecoRevisoes(planoRevisaoPreco);
@@ -42,14 +45,16 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
             throw new Exception("Tipo de plano de revisão não encontrado ou não é reembolsável.");
         }
 
-        var regioes = planoRevisaoPrecoModelView?.CdEmpresaRegiao?.Split(',').Select(int.Parse);
+        var regioes = planoRevisaoPrecoModelView?.CdEmpresaRegiao?.Split(',').Select(s => int.Parse(s.Trim())).ToList();
 
-        foreach(var regiao in regioes)
+        ValidaRegioes(regioes);
+
+        foreach (var regiao in regioes)
         {
             var tipoPrecoRegiaoExiste = _planoRevisaoPrecoRepository.Get(x => x.ID_PLANO_REVISAO_TIPO == planoRevisaoPrecoModelView.IdPlanoRevisaoTipo && x.ID_EMPRESA_REGIAO == regiao);
 
-            if (tipoPrecoRegiaoExiste == null)
-                throw new Exception("Preço já cadastrado para essa região neste plano de revisao!");
+            if (tipoPrecoRegiaoExiste != null)
+                throw new Exception($"Preço já cadastrado para a regiao {regiao} neste plano de revisao!");
 
             var planoRevisaoPreco = Map(planoRevisaoPrecoModelView, regiao);
             _planoRevisaoPrecoRepository.Create(planoRevisaoPreco);
@@ -58,7 +63,7 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
         return planoRevisaoPrecoModelView;
     }
 
-    public List<PlanoRevisaoPrecoGetModelView> ListPrecosVigentes() 
+    public List<PlanoRevisaoPrecoSemIdModelView> ListPrecosVigentes()
     {
         var planosPrecosVigentes = _planoRevisaoPrecoRepository.ListPrecosVigentes();
 
@@ -68,7 +73,8 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
         }
 
         return planosPrecosVigentes.Select(MapGet) // Remover os objetos "duplicados", de mesmo cdRegiao
-                                        .GroupBy(p => new {
+                                        .GroupBy(p => new
+                                        {
                                             p.IdPlanoRevisaoTipo,
                                             p.CdEmpresaRegiao,
                                             p.NuValor,
@@ -89,9 +95,10 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
 
         var regioes = _empresaRegiaoRepository.Get(x => x.CD_GRUPO_REGIAO == planoPreco.CdEmpresaRegiao).ToList();
 
-        var valoresPorRevisaoPorMesmaRegiao = _planoRevisaoPrecoRepository.Get(x => x.ID_PLANO_REVISAO_TIPO == planoPreco.IdPlanoRevisaoTipo && regioes.Select(r => r.ID_EMPRESA_REGIAO).Contains(x.ID_EMPRESA_REGIAO));
+        var planoRevisaoPrecoByRegiaoAndTipo = _planoRevisaoPrecoRepository.Get(x => x.ID_PLANO_REVISAO_TIPO == planoPreco.IdPlanoRevisaoTipo
+                                                                && regioes.Select(r => r.ID_EMPRESA_REGIAO).Contains(x.ID_EMPRESA_REGIAO));
 
-        foreach(var item in valoresPorRevisaoPorMesmaRegiao)
+        foreach (var item in planoRevisaoPrecoByRegiaoAndTipo)
         {
             var planoAtualizar = MapAtualizar(planoPreco, item.ID_EMPRESA_REGIAO, item.ID_PLANO_REVISAO_PRECO);
             _planoRevisaoPrecoRepository.Update(planoAtualizar);
@@ -101,9 +108,23 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
 
     }
 
-    private void ValidarAtualizacao(PlanoRevisaoPrecoModelView planoPreco) 
+    public void DeletaPrecoRevisaoPorTipo(int planoRevisaoTipo)
     {
-        var planoRevisaoPreco = _planoRevisaoPrecoRepository.GetByRegiaoAndTipo(planoPreco.IdPlanoRevisaoTipo, planoPreco.CdEmpresaRegiao);
+        var planosRevisaoPreco = _planoRevisaoPrecoRepository.Get(x => x.ID_PLANO_REVISAO_TIPO == planoRevisaoTipo).ToList();
+
+        if (planosRevisaoPreco is null)
+            throw new Exception("Plano de revisão preço não encontrado.");
+
+        foreach (var item in planosRevisaoPreco)
+        {
+            _planoRevisaoPrecoRepository.Delete(item);
+        }
+
+    }
+
+    private void ValidarAtualizacao(PlanoRevisaoPrecoModelView planoPreco)
+    {
+        var planoRevisaoPreco = _planoRevisaoPrecoRepository.GetByRegiaoAndTipo(planoPreco.IdPlanoRevisaoTipo, planoPreco.CdEmpresaRegiao).FirstOrDefault(); // Pegar apenas um, porque se vier mais, são iguais, mudando apenas a PK, que não é usada aqui
 
         if (planoRevisaoPreco is null)
             throw new Exception("Plano de revisão preço não encontrado.");
@@ -117,7 +138,44 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
         if (planoRevisaoAlterado?.IN_REEMBOLSAR.ToUpper() != "S")
             throw new Exception("O tipo de plano de revisão selecionado não é reembolsável.");
     }
-    
+
+
+    private void ValidaRegioes(List<int> regioes)
+    {
+        var regioesBanco = _empresaRegiaoRepository.GetAll().Select(er => er.ID_EMPRESA_REGIAO);
+
+        if (regioes.Any(r => !regioesBanco.Contains(r)))
+            throw new Exception("Uma ou mais regiões informadas não existem na base de dados.");
+    }
+
+    private void VerificaRegiaoDuplicada(List<PlanoRevisaoPrecoModelView> listPrecosPorRegiao)
+    {
+        foreach(var tipo in listPrecosPorRegiao.GroupBy(p => p.IdPlanoRevisaoTipo).Select(g => g.Key))
+        { 
+            List<int> listRegioes = new List<int>();
+
+            var listPorTipo = new List<PlanoRevisaoPrecoModelView>(listPrecosPorRegiao.Where(p => p.IdPlanoRevisaoTipo == tipo));
+
+            foreach (var item in listPorTipo)
+            {
+                var regioes = item.CdEmpresaRegiao?.Split(',').Select(s => int.Parse(s.Trim())).ToList();
+                if (regioes != null)
+                {
+                    ValidaRegioes(regioes);
+
+                    foreach (var regiao in regioes)
+                    {
+                        if (listRegioes.Contains(regiao))
+                        {
+                            throw new Exception($"Região {regiao} já cadastrada para o tipo de revisão {item.IdPlanoRevisaoTipo}.");
+                        }
+
+                        listRegioes.Add(regiao);
+                    }
+                }
+            }
+        }
+    }
 
     private PlanoRevisaoPreco Map(PlanoRevisaoPrecoModelView plano, int regiao)
     {
@@ -145,9 +203,9 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
         };
     }
 
-    private PlanoRevisaoPrecoGetModelView MapGet(PlanoRevisaoPrecoEntity planoRevisaoPreco)
+    private PlanoRevisaoPrecoSemIdModelView MapGet(PlanoRevisaoPrecoEntity planoRevisaoPreco)
     {
-        return new PlanoRevisaoPrecoGetModelView
+        return new PlanoRevisaoPrecoSemIdModelView
         {
             IdPlanoRevisaoTipo = planoRevisaoPreco.IdPlanoRevisaoTipo,
             CdEmpresaRegiao = planoRevisaoPreco.CdEmpresaRegiao,

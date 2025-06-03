@@ -4,7 +4,9 @@ namespace PlanoRevisaoAPI.Business;
 
 public interface IPlanoRevisaoPrecoBusiness
 {
-    List<PlanoRevisaoPrecoGetModelView> ListPrecosVigentes();
+    List<PlanoRevisaoPrecoSemIdModelView> ListPrecosVigentes();
     PlanoRevisaoPrecoModelView PostPrecoRevisoes(PlanoRevisaoPrecoModelView planoRevisaoPrecoModelView);
+    List<PlanoRevisaoPrecoModelView> PostPrecoRegioes(List<PlanoRevisaoPrecoModelView> listPrecosPorRegiao);
     PlanoRevisaoPrecoModelView AtualizaValores(PlanoRevisaoPrecoModelView planoPreco);
+    void DeletaPrecoRevisaoPorTipo(int planoRevisaoTipo);
 }

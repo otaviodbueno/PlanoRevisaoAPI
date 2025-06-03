@@ -1,6 +1,6 @@
 ﻿namespace PlanoRevisaoAPI.ModelView;
 
-public class PlanoRevisaoPrecoGetModelView
+public class PlanoRevisaoPrecoSemIdModelView
 {
     public int IdPlanoRevisaoTipo { get; set; }
 

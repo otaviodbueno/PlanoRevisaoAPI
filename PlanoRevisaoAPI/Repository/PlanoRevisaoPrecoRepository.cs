@@ -27,7 +27,7 @@ public class PlanoRevisaoPrecoRepository : Repository<PlanoRevisaoPreco>, IPlano
         return listPrecosVigentes;
     }
 
-    public PlanoRevisaoPreco GetByRegiaoAndTipo(int idPlanoRevisaoTipo, string cdEmpresaRegiao)
+    public List<PlanoRevisaoPreco> GetByRegiaoAndTipo(int idPlanoRevisaoTipo, string cdEmpresaRegiao)
     {
         var planoRevisaoPreco = (from preco in _context.Set<PlanoRevisaoPreco>()
                                  join regiao in _context.Set<EmpresaRegiao>() on preco.ID_EMPRESA_REGIAO equals regiao.ID_EMPRESA_REGIAO
@@ -40,7 +40,7 @@ public class PlanoRevisaoPrecoRepository : Repository<PlanoRevisaoPreco>, IPlano
                                      NU_VALOR = preco.NU_VALOR,
                                      DT_VIGENCIA_INICIAL = preco.DT_VIGENCIA_INICIAL,
                                      DT_VIGENCIA_FINAL = preco.DT_VIGENCIA_FINAL
-                                 }).FirstOrDefault(); // Pegar apenas um, porque se vier mais, são iguais, mudando apenas a PK, que não é usada aqui
+                                 }).ToList(); 
         return planoRevisaoPreco;
     }
 }

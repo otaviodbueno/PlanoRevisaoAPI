@@ -25,17 +25,32 @@ namespace PlanoRevisaoAPI.Controllers
         }
 
         [HttpPost]
+        [Route("PostPorCdGrupoUnico")]
         public ActionResult<PlanoRevisaoPrecoModelView> PostValoresRevisaoPorCdRegiao(PlanoRevisaoPrecoModelView planoRevisaoPrecoModelView)
         {
-            var post = _planoRevisaoPrecoBusiness.PostPrecoRevisoes(planoRevisaoPrecoModelView);
-            return Created("", post);
+            var postPreco = _planoRevisaoPrecoBusiness.PostPrecoRevisoes(planoRevisaoPrecoModelView);
+            return Created("", postPreco);
+        }
+
+        [HttpPost]
+        public ActionResult<List<PlanoRevisaoPrecoModelView>> PostValoresPorRegioes(List<PlanoRevisaoPrecoModelView> listPrecosRegioes)
+        {
+            var postPrecoRegioes = _planoRevisaoPrecoBusiness.PostPrecoRegioes(listPrecosRegioes);
+            return Created("", postPrecoRegioes);
         }
 
         [HttpPut]
         public ActionResult<PlanoRevisaoPrecoModelView> AtualizarValores(PlanoRevisaoPrecoModelView planoRevisaoPrecoModelView)
         {
-            var put = _planoRevisaoPrecoBusiness.AtualizaValores(planoRevisaoPrecoModelView);
-            return Created("", put);
+            var putPreco = _planoRevisaoPrecoBusiness.AtualizaValores(planoRevisaoPrecoModelView);
+            return Created("", putPreco);
+        }
+
+        [HttpDelete("{idPlanoRevisaoTipo}")]
+        public ActionResult<PlanoRevisaoPrecoSemIdModelView> DeletaPrecoRevisao(int idPlanoRevisaoTipo)
+        {
+            _planoRevisaoPrecoBusiness.DeletaPrecoRevisaoPorTipo(idPlanoRevisaoTipo);
+            return NoContent();
         }
     }
 }

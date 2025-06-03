@@ -135,6 +135,9 @@ public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
         {
             throw new Exception("Politica de venda não existe!");
         }
+
+        if (planoRevisao.NuMesesGarantia <= 0)
+            throw new Exception("Meses de garantia deve ser maior que zero!");
     }
 
    private PlanoRevisao Map(PlanoRevisaoModelView planorevisao)

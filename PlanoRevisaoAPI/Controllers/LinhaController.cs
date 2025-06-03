@@ -32,6 +32,13 @@ public class LinhaController : ControllerBase
         return Ok(linhas);
     }
 
+    [HttpGet("ListLinhasAtivas")]
+    public ActionResult<List<LinhaModelView>> ListLinhasAtivas()
+    {
+        var linhasAtivas = _linhaBusiness.ListLinhasAtivas();
+        return Ok(linhasAtivas);
+    }
+
     [HttpPost]
     public ActionResult<Linha> Post(LinhaModelView linha)
     {

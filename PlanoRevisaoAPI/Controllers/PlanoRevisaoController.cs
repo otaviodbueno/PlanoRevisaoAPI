@@ -32,7 +32,7 @@ public class PlanoRevisaoController : ControllerBase
     }
 
     [HttpPost]
-    public ActionResult Post(PlanoRevisaoModelView planoRevisao)
+    public ActionResult<PlanoRevisaoModelView> Post(PlanoRevisaoModelView planoRevisao)
     {
         _planoRevisaoBusiness.PostPlanoRevisao(planoRevisao);
         return Created("", planoRevisao);

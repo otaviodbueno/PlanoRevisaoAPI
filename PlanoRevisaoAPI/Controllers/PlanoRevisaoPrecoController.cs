@@ -2,55 +2,45 @@
 using PlanoRevisaoAPI.Business;
 using PlanoRevisaoAPI.ModelView;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace PlanoRevisaoAPI.Controllers
+namespace PlanoRevisaoAPI.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class PlanoRevisaoPrecoController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class PlanoRevisaoPrecoController : ControllerBase
+    private readonly IPlanoRevisaoPrecoBusiness _planoRevisaoPrecoBusiness;
+
+    public PlanoRevisaoPrecoController(IPlanoRevisaoPrecoBusiness planoRevisaoPrecoBusiness)
     {
-        private readonly IPlanoRevisaoPrecoBusiness _planoRevisaoPrecoBusiness;
+        _planoRevisaoPrecoBusiness = planoRevisaoPrecoBusiness;
+    }
 
-        public PlanoRevisaoPrecoController(IPlanoRevisaoPrecoBusiness planoRevisaoPrecoBusiness)
-        {
-            _planoRevisaoPrecoBusiness = planoRevisaoPrecoBusiness;
-        }
+    [HttpGet("ListPrecosVigentes")]
+    public ActionResult<List<PlanoRevisaoPrecoModelView>> GetPrecosVigentes()
+    {
+        var precosVigentes = _planoRevisaoPrecoBusiness.ListPrecosVigentes();
+        return Ok(precosVigentes);
+    }
 
-        [HttpGet("ListPrecosVigentes")]
-        public ActionResult<List<PlanoRevisaoPrecoModelView>> GetPrecosVigentes()
-        {
-            var precosVigentes = _planoRevisaoPrecoBusiness.ListPrecosVigentes();
-            return Ok(precosVigentes);
-        }
+    [HttpPost]
+    public ActionResult<List<PlanoRevisaoPrecoModelView>> PostValoresPorRegioes(List<PlanoRevisaoPrecoModelView> listPrecosRegioes)
+    {
+        var postPrecoRegioes = _planoRevisaoPrecoBusiness.PostPrecoRegioes(listPrecosRegioes);
+        return Created("", postPrecoRegioes);
+    }
 
-        [HttpPost]
-        [Route("PostPorCdGrupoUnico")]
-        public ActionResult<PlanoRevisaoPrecoModelView> PostValoresRevisaoPorCdRegiao(PlanoRevisaoPrecoModelView planoRevisaoPrecoModelView)
-        {
-            var postPreco = _planoRevisaoPrecoBusiness.PostPrecoRevisoes(planoRevisaoPrecoModelView);
-            return Created("", postPreco);
-        }
+    [HttpPut]
+    public ActionResult<List<PlanoRevisaoPrecoModelView>> AtualizaValoresRegioes(List<PlanoRevisaoPrecoModelView> listPrecosRegioes)
+    {
+        var putPrecoRegioes = _planoRevisaoPrecoBusiness.AtualizaValoresList(listPrecosRegioes);
+        return Created("", putPrecoRegioes);
+    }
 
-        [HttpPost]
-        public ActionResult<List<PlanoRevisaoPrecoModelView>> PostValoresPorRegioes(List<PlanoRevisaoPrecoModelView> listPrecosRegioes)
-        {
-            var postPrecoRegioes = _planoRevisaoPrecoBusiness.PostPrecoRegioes(listPrecosRegioes);
-            return Created("", postPrecoRegioes);
-        }
-
-        [HttpPut]
-        public ActionResult<PlanoRevisaoPrecoModelView> AtualizarValores(PlanoRevisaoPrecoModelView planoRevisaoPrecoModelView)
-        {
-            var putPreco = _planoRevisaoPrecoBusiness.AtualizaValores(planoRevisaoPrecoModelView);
-            return Created("", putPreco);
-        }
-
-        [HttpDelete("{idPlanoRevisaoTipo}")]
-        public ActionResult<PlanoRevisaoPrecoSemIdModelView> DeletaPrecoRevisao(int idPlanoRevisaoTipo)
-        {
-            _planoRevisaoPrecoBusiness.DeletaPrecoRevisaoPorTipo(idPlanoRevisaoTipo);
-            return NoContent();
-        }
+    [HttpDelete("{idPlanoRevisaoTipo}")]
+    public ActionResult<PlanoRevisaoPrecoSemIdModelView> DeletaPrecoRevisao(int idPlanoRevisaoTipo)
+    {
+        _planoRevisaoPrecoBusiness.DeletaPrecoRevisaoPorTipo(idPlanoRevisaoTipo);
+        return NoContent();
     }
 }

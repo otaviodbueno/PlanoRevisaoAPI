@@ -2,7 +2,6 @@
 using PlanoRevisaoAPI.Models;
 using PlanoRevisaoAPI.ModelView;
 using PlanoRevisaoAPI.Repository;
-using System.Collections.Generic;
 
 namespace PlanoRevisaoAPI.Business;
 
@@ -45,15 +44,15 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
             throw new Exception("Tipo de plano de revisão não encontrado ou não é reembolsável.");
         }
 
-        var regioes = planoRevisaoPrecoModelView?.CdEmpresaRegiao?.Split(',').Select(s => int.Parse(s.Trim())).ToList();
+        ValidaValor(planoRevisaoPrecoModelView);
 
-        ValidaRegioes(regioes);
+        var regioes = planoRevisaoPrecoModelView?.CdEmpresaRegiao?.Split(',').Select(s => int.Parse(s.Trim())).ToList();
 
         foreach (var regiao in regioes)
         {
             var tipoPrecoRegiaoExiste = _planoRevisaoPrecoRepository.Get(x => x.ID_PLANO_REVISAO_TIPO == planoRevisaoPrecoModelView.IdPlanoRevisaoTipo && x.ID_EMPRESA_REGIAO == regiao);
 
-            if (tipoPrecoRegiaoExiste != null)
+            if (tipoPrecoRegiaoExiste.Count() > 0)
                 throw new Exception($"Preço já cadastrado para a regiao {regiao} neste plano de revisao!");
 
             var planoRevisaoPreco = Map(planoRevisaoPrecoModelView, regiao);
@@ -91,12 +90,15 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
         /// Mesmo recebendo apenas um objeto, poderá atualizar mais, já que um grupo de região pode ter mais de um plano de revisão preço associado a ele
         /// Exemplo o cd "1,2,5"
 
-        ValidarAtualizacao(planoPreco);
-
         var regioes = _empresaRegiaoRepository.Get(x => x.CD_GRUPO_REGIAO == planoPreco.CdEmpresaRegiao).ToList();
 
         var planoRevisaoPrecoByRegiaoAndTipo = _planoRevisaoPrecoRepository.Get(x => x.ID_PLANO_REVISAO_TIPO == planoPreco.IdPlanoRevisaoTipo
                                                                 && regioes.Select(r => r.ID_EMPRESA_REGIAO).Contains(x.ID_EMPRESA_REGIAO));
+
+        if (regioes.Count() != planoRevisaoPrecoByRegiaoAndTipo.Count())
+            throw new Exception($"Regiões inválidas para o tipo {planoPreco.IdPlanoRevisaoTipo} de região {planoPreco.CdEmpresaRegiao}. Verifique!");
+
+        ValidarAtualizacao(planoPreco);
 
         foreach (var item in planoRevisaoPrecoByRegiaoAndTipo)
         {
@@ -106,6 +108,18 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
 
         return planoPreco;
 
+    }
+
+    public List<PlanoRevisaoPrecoModelView> AtualizaValoresList(List<PlanoRevisaoPrecoModelView> planoPreco)
+    {
+        VerificaRegioesUpdate(planoPreco);
+
+        foreach (var item in planoPreco)
+        {
+            AtualizaValores(item);
+        }
+
+        return planoPreco;
     }
 
     public void DeletaPrecoRevisaoPorTipo(int planoRevisaoTipo)
@@ -137,8 +151,15 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
 
         if (planoRevisaoAlterado?.IN_REEMBOLSAR.ToUpper() != "S")
             throw new Exception("O tipo de plano de revisão selecionado não é reembolsável.");
+
+        ValidaValor(planoPreco);
     }
 
+    private void ValidaValor(PlanoRevisaoPrecoModelView plano)
+    {
+        if (plano.NuValor == 0)
+            throw new Exception($"O valor do tipo de plano revisao {plano.IdPlanoRevisaoTipo} deve ser maior que zero!");
+    }
 
     private void ValidaRegioes(List<int> regioes)
     {
@@ -146,34 +167,70 @@ public class PlanoRevisaoPrecoBusiness : IPlanoRevisaoPrecoBusiness
 
         if (regioes.Any(r => !regioesBanco.Contains(r)))
             throw new Exception("Uma ou mais regiões informadas não existem na base de dados.");
+
+        if (!regioesBanco.OrderBy(x => x).SequenceEqual(regioes.OrderBy(x => x)))
+            throw new Exception("Uma ou mais regiões não foram informadas. Verifique!");
     }
 
     private void VerificaRegiaoDuplicada(List<PlanoRevisaoPrecoModelView> listPrecosPorRegiao)
     {
-        foreach(var tipo in listPrecosPorRegiao.GroupBy(p => p.IdPlanoRevisaoTipo).Select(g => g.Key))
-        { 
-            List<int> listRegioes = new List<int>();
+        var listPrecosPorRegiaoPorTipo = listPrecosPorRegiao.GroupBy(p => p.IdPlanoRevisaoTipo).Select(g => g.Key).ToList();
 
-            var listPorTipo = new List<PlanoRevisaoPrecoModelView>(listPrecosPorRegiao.Where(p => p.IdPlanoRevisaoTipo == tipo));
+        foreach (var tipo in listPrecosPorRegiaoPorTipo)
+        {
+            var listRegioes = new List<int>();
+
+            var listPorTipo = listPrecosPorRegiao.Where(p => p.IdPlanoRevisaoTipo == tipo);
 
             foreach (var item in listPorTipo)
             {
                 var regioes = item.CdEmpresaRegiao?.Split(',').Select(s => int.Parse(s.Trim())).ToList();
                 if (regioes != null)
                 {
-                    ValidaRegioes(regioes);
-
                     foreach (var regiao in regioes)
                     {
                         if (listRegioes.Contains(regiao))
                         {
-                            throw new Exception($"Região {regiao} já cadastrada para o tipo de revisão {item.IdPlanoRevisaoTipo}.");
+                            throw new Exception($"Região {regiao} duplicada para o tipo de revisão {item.IdPlanoRevisaoTipo}.");
                         }
 
                         listRegioes.Add(regiao);
                     }
                 }
             }
+
+            ValidaRegioes(listRegioes);
+        }
+    }
+
+    private void VerificaRegioesUpdate(List<PlanoRevisaoPrecoModelView> listPrecosPorRegiao)
+    {
+        var listPrecosPorRegiaoPorTipo = listPrecosPorRegiao.GroupBy(p => p.IdPlanoRevisaoTipo).Select(g => g.Key).ToList();
+
+        foreach (var tipo in listPrecosPorRegiaoPorTipo)
+        {
+            var listRegioesRecebidas = new List<int>();
+            var regioesRecebidas = new List<int>();
+            var regioesExistentesPorTipo = _planoRevisaoPrecoRepository.Get(x => x.ID_PLANO_REVISAO_TIPO == tipo).Select(x => x.ID_EMPRESA_REGIAO).OrderBy(x => x).ToList();
+
+            var listPorTipo = listPrecosPorRegiao.Where(p => p.IdPlanoRevisaoTipo == tipo).ToList();
+
+            foreach (var item in listPorTipo)
+            {
+                regioesRecebidas = item.CdEmpresaRegiao?.Split(',').Select(s => int.Parse(s.Trim())).ToList();
+
+                if (regioesRecebidas != null)
+                {
+                    listRegioesRecebidas.AddRange(regioesRecebidas);
+                }
+            }
+
+            ValidaRegioes(listRegioesRecebidas);
+
+            bool listasSaoIguais = listRegioesRecebidas.OrderBy(x => x).SequenceEqual(regioesExistentesPorTipo);
+
+            if (!listasSaoIguais)
+                throw new Exception("Todas as regiões já existentes para o " + tipo + " devem ser informadas. Verifique!");
         }
     }
 

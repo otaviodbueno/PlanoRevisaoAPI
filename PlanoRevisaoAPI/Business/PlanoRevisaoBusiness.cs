@@ -1,5 +1,4 @@
-﻿using Microsoft.Identity.Client;
-using PlanoRevisaoAPI.Models;
+﻿using PlanoRevisaoAPI.Models;
 using PlanoRevisaoAPI.ModelView;
 using PlanoRevisaoAPI.Repository;
 
@@ -11,9 +10,9 @@ public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
     private readonly IPlanoRevisaoTipoRepository _planoRevisaoTipoRepository;
     private readonly ILinhaBusiness _linhaBusiness;
     private readonly IPoliticaVendaRepository _politicaVendaRepository;
-    public PlanoRevisaoBusiness(IPlanoRevisaoRepository planoRevisaoRepository, 
-                                ILinhaBusiness linhaBusinnes, 
-                                IPoliticaVendaRepository politicaVendaRepository, 
+    public PlanoRevisaoBusiness(IPlanoRevisaoRepository planoRevisaoRepository,
+                                ILinhaBusiness linhaBusinnes,
+                                IPoliticaVendaRepository politicaVendaRepository,
                                 IPlanoRevisaoTipoRepository planoRevisaoTipoRepository)
     {
         _planoRevisaoRepository = planoRevisaoRepository;
@@ -31,6 +30,15 @@ public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
         }
 
         return planos.Select(x => Map(x)).ToList();
+    }
+
+    public List<PlanoRevisaoModelView> ListPlanosVigentes()
+    {
+        var planos = GetPlanosRevisao();
+
+        var planosVigentes = planos.Where(x => x.DtVigenciaInicial <= DateTime.Now && x.DtVigenciaFinal >= DateTime.Now).ToList();
+
+        return planosVigentes;
     }
 
     public PlanoRevisaoModelView GetPlanoRevisaoPorId(int id)
@@ -86,7 +94,7 @@ public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
 
         var planoRevisaoTipo = _planoRevisaoTipoRepository.Get(x => x.ID_PLANO_REVISAO == id).ToList();
 
-        if(planoRevisaoTipo != null && planoRevisaoTipo.Count > 0)
+        if (planoRevisaoTipo != null && planoRevisaoTipo.Count > 0)
         {
             throw new Exception("Não é possível deletar o plano de revisão, existem tipos vinculados a ele!");
         }
@@ -131,7 +139,7 @@ public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
 
         var politicaVenda = _politicaVendaRepository.Get(x => x.ID_POLITICA_VENDA == planoRevisao.IdPoliticaVenda);
 
-        if(politicaVenda is null)
+        if (politicaVenda is null)
         {
             throw new Exception("Politica de venda não existe!");
         }
@@ -140,7 +148,7 @@ public class PlanoRevisaoBusiness : IPlanoRevisaoBusiness
             throw new Exception("Meses de garantia deve ser maior que zero!");
     }
 
-   private PlanoRevisao Map(PlanoRevisaoModelView planorevisao)
+    private PlanoRevisao Map(PlanoRevisaoModelView planorevisao)
     {
         return new PlanoRevisao
         {

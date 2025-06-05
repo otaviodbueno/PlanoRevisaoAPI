@@ -7,6 +7,7 @@ namespace PlanoRevisaoAPI.Business
     {
         List<PlanoRevisaoModelView> GetPlanosRevisao();
         PlanoRevisaoModelView GetPlanoRevisaoPorId(int id);
+        List<PlanoRevisaoModelView> ListPlanosVigentes();
         PlanoRevisao PostPlanoRevisao(PlanoRevisaoModelView planoRevisao);
         PlanoRevisaoModelView AtualizarPlanoRevisao(PlanoRevisaoModelView planoRevisao);
         PlanoRevisaoModelView DeletarPlanoRevisao(int id);

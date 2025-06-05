@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PlanoRevisaoAPI.Business;
-using PlanoRevisaoAPI.Models;
 using PlanoRevisaoAPI.ModelView;
 
 
@@ -18,7 +17,7 @@ public class PlanoRevisaoController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<PlanoRevisaoModelView> GetPlanos()
+    public ActionResult<List<PlanoRevisaoModelView>> GetPlanos()
     {
         var planosRevisao = _planoRevisaoBusiness.GetPlanosRevisao();
         return Ok(planosRevisao);
@@ -29,6 +28,13 @@ public class PlanoRevisaoController : ControllerBase
     {
         var planoRevisao = _planoRevisaoBusiness.GetPlanoRevisaoPorId(id);
         return Ok(planoRevisao);
+    }
+
+    [HttpGet("ListPlanosVigentes")]
+    public ActionResult<List<PlanoRevisaoModelView>> ListPlanosVigentes()
+    {
+        var planosVigentes = _planoRevisaoBusiness.ListPlanosVigentes();
+        return Ok(planosVigentes);
     }
 
     [HttpPost]

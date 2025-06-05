@@ -15,10 +15,10 @@ namespace PlanoRevisaoAPI.Controllers
             _planoRevisaoTipoBusiness = planoRevisaoTipoBusiness;
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<List<PlanoRevisaoTipoModelView>> GetPorIdPlanoRevisao(int id)
+        [HttpGet("{idPlanoRevisao}")]
+        public ActionResult<List<PlanoRevisaoTipoModelView>> GetPorIdPlanoRevisao(int idPlanoRevisao)
         {
-            var tiposPlanoRevisao = _planoRevisaoTipoBusiness.GetById(id);
+            var tiposPlanoRevisao = _planoRevisaoTipoBusiness.GetById(idPlanoRevisao);
             return Ok(tiposPlanoRevisao);
         }
 

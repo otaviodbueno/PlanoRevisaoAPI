@@ -9,7 +9,7 @@ public class LinhaBusiness : ILinhaBusiness
     private readonly ILinhaRepository _linhaRepository;
     private readonly IPlanoRevisaoRepository _planoRevisaoRepository;
     private readonly IPlanoRevisaoTipoRepository _planoRevisaoTipoRepository;
-    public LinhaBusiness(ILinhaRepository linhaRepository, 
+    public LinhaBusiness(ILinhaRepository linhaRepository,
                         IPlanoRevisaoRepository planoRevisaoRepository,
                         IPlanoRevisaoTipoRepository planoRevisaoTipoRepository)
     {
@@ -31,16 +31,16 @@ public class LinhaBusiness : ILinhaBusiness
         {
             throw new Exception("Linha não encontrada");
         }
-        
+
         return linha.Select(x => Map(x)).ToList();
     }
 
     public LinhaModelView GetLinhaPorId(int id)
     {
         var linha = _linhaRepository.GetById(id);
-        if (linha is null)
+        if (linha is null || linha.IN_ATIVO == false)
         {
-            throw new Exception("Linha não encontrada");
+            throw new Exception("Linha não encontrada ou inativa!");
         }
         return Map(linha);
     }
@@ -79,7 +79,7 @@ public class LinhaBusiness : ILinhaBusiness
         {
             var linha = _linhaRepository.GetById(id);
 
-            if(linha is null)
+            if (linha is null)
             {
                 throw new Exception("Linha não encontrada");
             }
@@ -93,7 +93,7 @@ public class LinhaBusiness : ILinhaBusiness
 
             _linhaRepository.DeleteById(id);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             throw;
         }
@@ -105,7 +105,7 @@ public class LinhaBusiness : ILinhaBusiness
         {
             var linhaExiste = _linhaRepository.Get(x => x.ID_LINHA == linha.IdLinha).Any();
 
-            if(!linhaExiste)
+            if (!linhaExiste)
             {
                 throw new Exception("Linha não encontrada");
             }

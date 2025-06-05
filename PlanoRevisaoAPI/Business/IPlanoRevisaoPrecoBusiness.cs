@@ -8,5 +8,6 @@ public interface IPlanoRevisaoPrecoBusiness
     PlanoRevisaoPrecoModelView PostPrecoRevisoes(PlanoRevisaoPrecoModelView planoRevisaoPrecoModelView);
     List<PlanoRevisaoPrecoModelView> PostPrecoRegioes(List<PlanoRevisaoPrecoModelView> listPrecosPorRegiao);
     PlanoRevisaoPrecoModelView AtualizaValores(PlanoRevisaoPrecoModelView planoPreco);
+    List<PlanoRevisaoPrecoModelView> AtualizaValoresList(List<PlanoRevisaoPrecoModelView> planoPreco);
     void DeletaPrecoRevisaoPorTipo(int planoRevisaoTipo);
 }
